@@ -162,7 +162,7 @@ class KsuCliRepository(context: Context) {
                 .add("${getKsuDaemonPath()} debug get-sign ${shellQuote(packageResourcePath)}")
                 .to(ArrayList<String>(), null).exec().out
             out.firstOrNull()?.trim()
-                .orEmpty() == "size: 0x377, hash: d3469712b6214462764a1d8d3e5cbe1d6819a0b629791b9f4101867821f1df64"
+                .orEmpty() == "size: 0x3d8, hash: ef8f8fea3319735fad79accd53ac398dc898e380e4460c728e386ff32477ad9d"
         }
 
     suspend fun getFeatureStatus(feature: String): String = withContext(Dispatchers.IO) {

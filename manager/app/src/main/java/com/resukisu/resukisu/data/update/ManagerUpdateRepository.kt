@@ -17,7 +17,7 @@ class ManagerUpdateRepository(
     private companion object {
         const val UPDATE_CALL_TIMEOUT_SECONDS = 8L
         const val TAG = "ManagerUpdateRepository"
-        const val REPOSITORY = "ReSukiSU/ReSukiSU"
+        const val REPOSITORY = "shivangkumar35819-code/SHIV-SU"
         const val WORKFLOW_FILE = "build-manager.yml"
         const val BRANCH = "main"
         const val RELEASE_ARTIFACT = "Manager-release"
@@ -30,7 +30,7 @@ class ManagerUpdateRepository(
     }
 
     private val managerApkPattern = Regex(
-        "^ReSukiSU_(.+)_(\\d+)-(arm64-v8a|armeabi-v7a|x86_64|universal)-release\\.apk$"
+        "^SHIVKSU-NEXT_(.+)_(\\d+)-(arm64-v8a|armeabi-v7a|x86_64|universal)-release\\.apk$"
     )
     private val commitCountLinkPattern = Regex("""[?&]page=(\d+)>; rel="last"""")
 
@@ -83,7 +83,7 @@ class ManagerUpdateRepository(
             versionCode = versionCode,
             versionName = headSha.take(SHORT_SHA_LENGTH),
             abi = preferredAbi,
-            fileName = "ReSukiSU_${headSha.take(SHORT_SHA_LENGTH)}_" +
+            fileName = "SHIVKSU-NEXT_${headSha.take(SHORT_SHA_LENGTH)}_" +
                     "$versionCode-$preferredAbi-release.apk",
             source = ManagerApkSource.NightlyArtifact(
                 url = "https://nightly.link/$REPOSITORY/actions/runs/$runId/$RELEASE_ARTIFACT.zip",
