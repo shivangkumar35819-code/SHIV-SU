@@ -1,0 +1,43 @@
+name: Publish verified SHIVKSU NEXT
+on:
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: '39354466957'
+          name: SHIVKSU-NEXT-release
+          path: release
+      - uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: '39354154871'
+          pattern: '*-lkm'
+          path: release/LKM
+      - uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: '39354154871'
+          pattern: ksuinit-*
+          path: release/ksuinit
+      - name: Verify packaged artifacts
+        run: |
+          python3 scripts/verify_artifacts.py release --certificate docs/shivksu-next-certificate.der
+          test "$(find release/LKM -name '*_kernelsu.ko' | wc -l)" -eq 16
+          cd release
+          sha256sum -c SHA256SUMS.txt
+          zip -qr SHIVKSU-NEXT-LKM-GKI-v4.2.1.zip LKM ksuinit
+          sha256sum SHIVKSU-NEXT-LKM-GKI-v4.2.1.zip >> SHA256SUMS.txt
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create shivksu-next-v4.2.1-r1 release/*.apk release/*.zip release/SHA256SUMS.txt \
+            --target e58d055a --title 'SHIVKSU NEXT 4.2.1' --notes-file docs/SHIVKSU-NEXT-release.md
