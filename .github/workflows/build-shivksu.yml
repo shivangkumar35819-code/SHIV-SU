@@ -1,0 +1,77 @@
+name: Package SHIVKSU NEXT
+on:
+  workflow_dispatch:
+    inputs:
+      backend_run_id:
+        description: Successful matching SukiSU backend build run
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Configure signing
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+        run: |
+          printf '%s' "$KEYSTORE" | base64 -d > manager/key.jks
+      - name: Build release manager
+        working-directory: manager
+        env:
+          ORG_GRADLE_PROJECT_KEYSTORE_FILE: key.jks
+          ORG_GRADLE_PROJECT_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          ORG_GRADLE_PROJECT_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          ORG_GRADLE_PROJECT_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew assembleRelease lintRelease
+      - name: Wait for matching backend artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKEND_RUN: ${{ inputs.backend_run_id }}
+        run: |
+          for attempt in $(seq 1 40); do
+            count=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BACKEND_RUN/artifacts" --jq '[.artifacts[] | select(.name | startswith("ksud-"))] | length')
+            if [ "$count" -eq 3 ]; then exit 0; fi
+            state=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BACKEND_RUN" --jq .status)
+            if [ "$state" = completed ]; then echo 'Backend did not produce all three daemons'; exit 1; fi
+            sleep 30
+          done
+          exit 1
+      - uses: actions/download-artifact@v8
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ inputs.backend_run_id }}
+          pattern: ksud-*
+          path: backend
+      - name: Package complete APKs
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          for target in aarch64-linux-android armv7-linux-androideabi x86_64-linux-android; do
+            mkdir -p "target/$target/release"
+            binary=$(find "backend/ksud-$target" -name ksud -type f | head -n 1)
+            test -n "$binary"
+            cp "$binary" "target/$target/release/ksud"
+          done
+          python3 repack_apk_multi.py repack -b release -t release \
+            -a arm64-v8a -a armeabi-v7a -a x86_64 \
+            -K manager/key.jks -A "$KEY_ALIAS" -P "$KEYSTORE_PASSWORD" -S "$KEY_PASSWORD" --strip
+          signer=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n 1)
+          for apk in dist/*.apk; do "$signer" verify --verbose "$apk"; done
+          sha256sum dist/*.apk > dist/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: SHIVKSU-NEXT-release
+          path: dist/*
