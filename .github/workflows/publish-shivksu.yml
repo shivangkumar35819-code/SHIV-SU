@@ -32,6 +32,7 @@ jobs:
           python3 scripts/verify_artifacts.py release --certificate docs/shivksu-next-certificate.der
           test "$(find release/LKM -name '*_kernelsu.ko' | wc -l)" -eq 16
           cd release
+          sed -i 's|  dist/|  |' SHA256SUMS.txt
           sha256sum -c SHA256SUMS.txt
           zip -qr SHIVKSU-NEXT-LKM-GKI-v4.2.1.zip LKM ksuinit
           sha256sum SHIVKSU-NEXT-LKM-GKI-v4.2.1.zip >> SHA256SUMS.txt
@@ -40,4 +41,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create shivksu-next-v4.2.1-r1 release/*.apk release/*.zip release/SHA256SUMS.txt \
-            --target e58d055a --title 'SHIVKSU NEXT 4.2.1' --notes-file docs/SHIVKSU-NEXT-release.md
+            --target e58d055aaddd2d1c64a58f12976b91845ed94a66 --title 'SHIVKSU NEXT 4.2.1' --notes-file docs/SHIVKSU-NEXT-release.md

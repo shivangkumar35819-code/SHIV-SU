@@ -70,7 +70,7 @@ jobs:
             -K manager/key.jks -A "$KEY_ALIAS" -P "$KEYSTORE_PASSWORD" -S "$KEY_PASSWORD" --strip
           signer=$(find "$ANDROID_HOME/build-tools" -name apksigner -type f | sort -V | tail -n 1)
           for apk in dist/*.apk; do "$signer" verify --verbose "$apk"; done
-          sha256sum dist/*.apk > dist/SHA256SUMS.txt
+          (cd dist && sha256sum ./*.apk > SHA256SUMS.txt)
       - uses: actions/upload-artifact@v7
         with:
           name: SHIVKSU-NEXT-release
