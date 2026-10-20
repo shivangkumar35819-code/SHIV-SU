@@ -10,6 +10,9 @@ Launcher and home page use the SHIVKSU NEXT name. Package: com.shivksu.next.
 
 Run the Build Manager GitHub Actions workflow. It builds matching LKM modules,
 ksuinit, ksud for ARM64 / ARMv7 / x86_64, and repacks them into signed APKs.
+After backend compilation, Package SHIVKSU NEXT can rebuild the latest manager
+with that backend run ID. This workflow runs assembleRelease and lintRelease,
+repackages the daemon into each APK, verifies signatures and writes SHA256SUMS.
 Repository secrets: KEYSTORE (base64 JKS), KEY_ALIAS, KEYSTORE_PASSWORD,
 KEY_PASSWORD. The release certificate fingerprint is pinned in the kernel;
 keep the same signing key for updates. Never commit private signing material.
@@ -28,5 +31,7 @@ ARMv7 manager support does not provide an ARMv7 GKI LKM.
 Magisk, APatch and other root implementations are not interchangeable with
 the KernelSU kernel interface. Existing kernels must trust this manager's
 signing certificate or explicitly support adding it as a manager.
+SukiSU uses one live umount list with save/apply persistence; the manager's
+saved-list controls are adapted to that backend behavior.
 
 Upstream licenses and contributor notices are retained in this repository.
