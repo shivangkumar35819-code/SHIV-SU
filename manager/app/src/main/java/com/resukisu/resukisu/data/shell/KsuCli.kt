@@ -673,7 +673,7 @@ class KsuCliRepository(context: Context) {
 
     fun listKernelUmountPaths(): String {
         val shell = getRootShell()
-        val cmd = "${getKsuDaemonPath()} kernel umount list"
+        val cmd = "${getKsuDaemonPath()} umount list"
         return try {
             runCmd(shell, cmd).trim()
         } catch (e: Exception) {
@@ -685,7 +685,7 @@ class KsuCliRepository(context: Context) {
     fun addUmountConfigUmountPath(path: String, flags: Int): Boolean {
         val shell = getRootShell()
         val flagsArg = if (flags >= 0) "--flags $flags" else ""
-        val cmd = "${getKsuDaemonPath()} umount-config add $path $flagsArg"
+        val cmd = "${getKsuDaemonPath()} umount add ${shellQuote(path)} $flagsArg && ${getKsuDaemonPath()} umount save"
         val result = ShellUtils.fastCmdResult(shell, cmd)
         Log.i(TAG, "add umount path $path result: $result")
         return result
@@ -693,7 +693,7 @@ class KsuCliRepository(context: Context) {
 
     fun removeUmountConfigUmountPath(path: String): Boolean {
         val shell = getRootShell()
-        val cmd = "${getKsuDaemonPath()} umount-config del $path"
+        val cmd = "${getKsuDaemonPath()} umount remove ${shellQuote(path)}"
         val result = ShellUtils.fastCmdResult(shell, cmd)
         Log.i(TAG, "remove umount path $path result: $result")
         return result
@@ -701,7 +701,7 @@ class KsuCliRepository(context: Context) {
 
     fun listUmountConfigUmountPaths(): String {
         val shell = getRootShell()
-        val cmd = "${getKsuDaemonPath()} umount-config list"
+        val cmd = "${getKsuDaemonPath()} umount list"
         return try {
             runCmd(shell, cmd).trim()
         } catch (e: Exception) {
