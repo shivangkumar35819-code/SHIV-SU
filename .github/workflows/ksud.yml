@@ -5,10 +5,6 @@ on:
       target:
         required: true
         type: string
-      os:
-        required: false
-        type: string
-        default: ubuntu-latest
       pack_lkm:
         required: false
         type: boolean
@@ -17,72 +13,65 @@ on:
         required: false
         type: boolean
         default: true
-      use_cache:
-        required: false
-        type: boolean
-        default: true
-env:
-  CARGO_TERM_COLOR: always
 jobs:
   build:
-    name: Build ksud (${{ inputs.target }})
-    runs-on: ${{ inputs.os }}
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
 
-      - name: Download artifacts
-        uses: actions/download-artifact@v8
+    - name: Download artifacts
+      uses: actions/download-artifact@v8
+    
+    - name: Prepare LKM files
+      if: ${{ inputs.pack_lkm }}
+      run: |
+        cp aarch64-android*-lkm/*_kernelsu.ko ./userspace/ksud/bin/aarch64/
+        cp x86_64-android*-lkm/*_kernelsu.ko ./userspace/ksud/bin/x86_64/
+    
+    - name: Prepare ksuinit
+      if: ${{ inputs.pack_ksuinit }}
+      run: |
+        mv ksuinit-aarch64/ksuinit ./userspace/ksud/bin/aarch64/
+        mv ksuinit-x86_64/ksuinit ./userspace/ksud/bin/x86_64/
+        
+    - name: Setup rustup
+      run: |
+        if [ "${{ inputs.target }}" = riscv64-linux-android ]; then
+          rustup toolchain install nightly-2026-09-23 --profile minimal --component rust-src
+        else
+          rustup update stable
+          rustup target add ${{ inputs.target }}
+        fi
 
-      - name: Prepare LKM fies
-        if: ${{ inputs.pack_lkm }}
-        run: |
-          cp aarch64-android*-lkm/*_kernelsu.ko ./userspace/ksud/bin/aarch64/
-          cp x86_64-android*-lkm/*_kernelsu.ko ./userspace/ksud/bin/x86_64/
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: userspace/ksud
+        cache-targets: false
 
-      - name: Prepare ksuinit
-        if: ${{ inputs.pack_ksuinit }}
-        run: |
-          mv ksuinit-aarch64/ksuinit ./userspace/ksud/bin/aarch64/
-          mv ksuinit-x86_64/ksuinit ./userspace/ksud/bin/x86_64/
+    - uses: nttld/setup-ndk@v1
+      id: setup-ndk
+      with:
+        ndk-version: r29
 
-      - name: Setup Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: nightly
-          targets: ${{ inputs.target }}
-          components: rust-src
+    - name: Build ksud
+      env:
+        ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          export KSU_PACKAGE_NAME="com.sukisu.ultra.pr"
+        fi
+        if [ "${{ inputs.target }}" = riscv64-linux-android ]; then
+          source .github/scripts/setup-rust-build.sh riscv64-linux-android 35
+          cargo +nightly-2026-09-23 build --config .github/riscv64-cargo.toml -Z build-std=std,panic_abort --target "$TRIPLE" --release --manifest-path ./userspace/ksud/Cargo.toml
+        else
+          source .github/scripts/setup-rust-build.sh ${{ inputs.target }} 26
+          cargo build --target "$TRIPLE" --release --manifest-path ./userspace/ksud/Cargo.toml
+        fi
 
-      - uses: Swatinem/rust-cache@v2
-        if: github.event_name != 'pull_request'
-        with:
-          prefix-key: ksud-${{ inputs.target }}
-          workspaces: userspace/ksud
-          cache-targets: true
-
-      - name: Setup cargo-ndk
-        run: cargo install cargo-ndk --locked
-
-      - name: Assemble LKM bootstrap
-        run: |
-          clang --target=aarch64-linux-gnu -c -nostdlib \
-            -o userspace/ksud/.lkm_image_bootstrap.o \
-            userspace/ksud/src/lkm_image_bootstrap.S
-
-      - name: Build ksud
-        run: |
-          if [ "${{github.event_name}}" == "pull_request" ]; then
-            export KSU_PACKAGE_NAME="com.resukisu.resukisu.pr${{github.event.pull_request.number}}"
-          elif [ "${{github.ref_type}}" != "tag" ] && [ "${{github.ref_name}}" != "main" ]; then
-            export KSU_PACKAGE_NAME="com.resukisu.resukisu.dev"
-          fi
-
-          cd userspace/ksud/
-          cargo ndk b -P 26 -t ${{ inputs.target }} -r -Z build-std-features="optimize_for_size" -Z trim-paths
-
-      - name: Upload ksud artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: ksud-${{ inputs.target }}
-          path: userspace/ksud/target/**/release/ksud*
+    - name: Upload ksud artifact
+      uses: actions/upload-artifact@v7
+      with:
+        name: ksud-${{ inputs.target }}
+        path: target/${{ inputs.target }}/release/ksud

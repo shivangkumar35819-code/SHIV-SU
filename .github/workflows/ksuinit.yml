@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ${{ inputs.os }}
     steps:
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
         
@@ -38,14 +38,13 @@ jobs:
         BUILTINS="$($CLANG_PATH --print-resource-dir)/lib/linux/libclang_rt.builtins-aarch64-android.a"
         test -f "$BUILTINS"
         export RUSTFLAGS="-C target-feature=+crt-static -C link-arg=-Wl,-z,max-page-size=16384 -C link-arg=-Wno-unused-command-line-argument -C link-arg=$BUILTINS"
-        cd userspace/ksuinit
         cargo build --package ksuinit --target=aarch64-linux-android --release
 
     - name: Upload ksuinit artifact
       uses: actions/upload-artifact@v7
       with:
         name: ksuinit-aarch64
-        path: userspace/ksuinit/target/aarch64-linux-android/release/ksuinit
+        path: target/aarch64-linux-android/release/ksuinit
 
     - name: Build ksuinit x64
       env:
@@ -55,11 +54,11 @@ jobs:
         BUILTINS="$($CLANG_PATH --print-resource-dir)/lib/linux/libclang_rt.builtins-x86_64-android.a"
         test -f "$BUILTINS"
         export RUSTFLAGS="-C target-feature=+crt-static -C link-arg=-Wl,-z,max-page-size=16384 -C link-arg=-Wno-unused-command-line-argument -C link-arg=$BUILTINS"
-        cd userspace/ksuinit
         cargo build --package ksuinit --target=x86_64-linux-android --release
 
     - name: Upload x64 ksuinit artifact
       uses: actions/upload-artifact@v7
       with:
         name: ksuinit-x86_64
-        path: userspace/ksuinit/target/x86_64-linux-android/release/ksuinit
+        path: target/x86_64-linux-android/release/ksuinit
+

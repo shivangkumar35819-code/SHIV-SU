@@ -1,7 +1,13 @@
 #[cfg(target_os = "android")]
 mod android {
     use const_format::concatcp;
-    use serde::Serialize;
+    use std::time::Duration;
+
+    pub const BOOT_STAGE_TIMEOUT: Duration = Duration::from_secs(35);
+    pub const EMULATED_SOFT_REBOOT_TIMEOUT: Duration = Duration::from_secs(5);
+    pub const WAITSYS_READY_TIMEOUT: Duration = Duration::from_secs(2);
+    pub const WAITSYS_STOP_TIMEOUT: Duration = Duration::from_secs(5);
+    pub const BOOTLOG_TIMEOUT: &str = "30s";
 
     pub const ADB_DIR: &str = "/data/adb/";
     pub const WORKING_DIR: &str = concatcp!(ADB_DIR, "ksu/");
@@ -46,10 +52,6 @@ mod android {
     pub const METAMODULE_MOUNT_SCRIPT: &str = "metamount.sh";
     pub const METAMODULE_METAINSTALL_SCRIPT: &str = "metainstall.sh";
     pub const METAMODULE_METAUNINSTALL_SCRIPT: &str = "metauninstall.sh";
-    pub const METAMODULE_MOUNT_SCRIPT_LOG: &str = concatcp!(LOG_DIR, "metamodule_mount");
-    pub const METAMODULE_METAUNINSTALL_SCRIPT_LOG: &str =
-        concatcp!(LOG_DIR, "metamodule_metauninstall");
-    pub const METAMODULE_DEBUG: &str = concatcp!(WORKING_DIR, "metamodule.debug");
 
     pub const KSU_BACKUP_DIR: &str = WORKING_DIR;
     pub const KSU_BACKUP_FILE_PREFIX: &str = "ksu_backup_";
@@ -59,23 +61,15 @@ mod android {
     pub const DEFAULT_PACKAGE_NAME: &str = env!("KSU_PACKAGE_NAME");
 
     pub const UMOUNT_CONFIG_PATH: &str = concatcp!(WORKING_DIR, ".umount");
-
-    pub const DYNAMIC_MANAGER: &str = concatcp!(WORKING_DIR, ".dynamic_manager");
-    pub const SUSFS_CONFIG: &str = concatcp!(WORKING_DIR, ".susfs.json");
-
-    #[derive(Serialize)]
-    pub struct MountInfo {
-        pub path: String,
-        pub flags: u32,
-    }
 }
 
+#[allow(unused)]
 pub const VERSION_CODE: &str = env!("VERSION_CODE");
 pub const VERSION_NAME: &str = env!("VERSION_NAME");
 #[cfg(target_os = "android")]
 pub const FULL_VERSION: &str = const_format::formatcp!(
     "{VERSION_NAME} (uapi: {})",
-    crate::android::uapi::KERNEL_SU_UAPI_VERSION
+    crate::ksu_uapi::KERNEL_SU_UAPI_VERSION
 );
 
 #[cfg(target_os = "android")]

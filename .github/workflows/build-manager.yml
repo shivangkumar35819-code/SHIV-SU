@@ -104,7 +104,6 @@ jobs:
     uses: ./.github/workflows/ksud.yml
     with:
       target: ${{ matrix.target }}
-      os: ${{ matrix.os }}
 
   build-manager:
     needs: [prepare]
@@ -114,8 +113,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - manager_type: "spoofed"
-            build_type: "release"
 
           - manager_type: "normal"
             build_type: "release"
@@ -197,7 +194,7 @@ jobs:
             export BUILD_EXTRA_ARGS="-PKSU_PACKAGE_NAME=$KSU_PACKAGE_NAME"
           elif [ "${{ github.ref_type }}" != "tag" ] && [ "${{ github.ref_name }}" != "main" ]; then
             export KSU_PACKAGE_NAME="com.resukisu.resukisu.dev"
-            export KSU_NAME="ReSukiSU-DEV"
+            export KSU_NAME="SHIVKSU NEXT"
             export BUILD_EXTRA_ARGS="-PKSU_PACKAGE_NAME=$KSU_PACKAGE_NAME -PKSU_NAME=$KSU_NAME"
           fi
 
@@ -230,8 +227,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - manager_type: "spoofed"
-            build_type: "release"
           - manager_type: "normal"
             build_type: "release"
           - manager_type: "normal"
@@ -345,61 +340,3 @@ jobs:
         with:
           name: ${{ steps.determine.outputs.title }}-${{ matrix.build_type }}
           path: dist/*.apk
-
-  upload-telegram:
-    needs: repack-manager
-    if: github.event_name != 'pull_request' && github.event_name != 'workflow_call'
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        manager_type: [ "spoofed", "normal" ]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-      - name: Setup need_upload
-        id: need_upload
-        run: |
-          if [ ! -z "${{ secrets.BOT_TOKEN }}" ]; then
-            echo "UPLOAD=true" >> $GITHUB_OUTPUT
-          else
-            echo "UPLOAD=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Determine manager variant
-        id: determine
-        run: |
-          if [ "${{ matrix.manager_type }}" == "spoofed" ]; then
-            echo "title=Spoofed-Manager" >> $GITHUB_OUTPUT
-            echo "topicid=${{ vars.MESSAGE_SPOOFED_THREAD_ID }}" >> $GITHUB_OUTPUT
-          else
-            echo "title=Manager" >> $GITHUB_OUTPUT
-            echo "topicid=${{ vars.MESSAGE_THREAD_ID }}" >> $GITHUB_OUTPUT
-          fi
-
-          if [[ "${{ github.ref }}" != "refs/heads/main" && "${{ github.ref_type }}" != "tag" ]]; then
-            echo "topicid=${{ vars.MESSAGE_DEVELOPING_MANAGER_THREAD_ID }}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Download Release artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ steps.determine.outputs.title }}-release
-          path: ./apk/release
-
-      - name: Upload to Telegram
-        if: steps.need_upload.outputs.UPLOAD == 'true'
-        env:
-          CHAT_ID: ${{ vars.CHAT_ID }}
-          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-          MESSAGE_THREAD_ID: ${{ steps.determine.outputs.topicid }}
-          DEVELOPING_THREAD_ID: ${{ vars.MESSAGE_DEVELOPING_MANAGER_THREAD_ID }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          TITLE: ${{ steps.determine.outputs.title }}
-          BRANCH: ${{ github.ref_name }}
-        run: |
-          pip3 install python-telegram-bot
-          export VERSION=$(git rev-list --count HEAD)
-          APK_RELEASE=apk/release/*.apk
-          python3 $GITHUB_WORKSPACE/scripts/ksubot.py $APK_RELEASE

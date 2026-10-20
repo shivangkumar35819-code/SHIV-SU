@@ -13,7 +13,7 @@ add_library(kernelsu
         legacy.c
 )
 
-target_include_directories(kernelsu PRIVATE .)
+target_include_directories(kernelsu PRIVATE compat-uapi "${CMAKE_CURRENT_SOURCE_DIR}/../../../../../.." .)
 
 find_library(log-lib log)
 

@@ -19,21 +19,12 @@
 #define __PT_IP_REG pc
 #define __PT_ORIG_SYSCALL_REG regs[8]
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 #define REBOOT_SYMBOL "__arm64_sys_reboot"
 #define SYS_READ_SYMBOL "__arm64_sys_read"
 #define SYS_EXECVE_SYMBOL "__arm64_sys_execve"
-#define SYS_SETNS_SYMBOL __arm64_sys_setns
 // https://cs.android.com/android/kernel/superproject/+/common-android-mainline:common/scripts/syscalltbl.sh;l=57;drc=9142be9e6443fd641ca37f820efe00d9cd890eb1
 // https://cs.android.com/android/kernel/superproject/+/common-android-mainline:common/scripts/syscall.tbl;l=104;drc=b36d4b6aa88ef039647228b98c59a875e92f8c8e
 #define SYS_FSTAT_SYMBOL "__arm64_sys_newfstat"
-#else
-#define REBOOT_SYMBOL "sys_reboot"
-#define SYS_READ_SYMBOL "sys_read"
-#define SYS_EXECVE_SYMBOL "sys_execve"
-#define SYS_SETNS_SYMBOL sys_setns
-#define SYS_FSTAT_SYMBOL "compat_sys_newfstat"
-#endif
 
 #elif defined(__x86_64__)
 
@@ -51,24 +42,35 @@
 #define __PT_SP_REG sp
 #define __PT_IP_REG ip
 #define __PT_ORIG_SYSCALL_REG orig_ax
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 #define REBOOT_SYMBOL "__x64_sys_reboot"
 #define SYS_READ_SYMBOL "__x64_sys_read"
 #define SYS_EXECVE_SYMBOL "__x64_sys_execve"
-#define SYS_SETNS_SYMBOL __x64_sys_setns
 #define SYS_FSTAT_SYMBOL "__x64_sys_newfstat"
-#else
-#define REBOOT_SYMBOL "sys_reboot"
-#define SYS_READ_SYMBOL "sys_read"
-#define SYS_EXECVE_SYMBOL "sys_execve"
-#define SYS_SETNS_SYMBOL sys_setns
-#endif
+
+#elif defined(__riscv)
+
+#define __PT_PARM1_REG a0
+#define __PT_SYSCALL_PARM1_REG orig_a0
+#define __PT_PARM2_REG a1
+#define __PT_PARM3_REG a2
+#define __PT_SYSCALL_PARM4_REG a3
+#define __PT_CCALL_PARM4_REG a3
+#define __PT_PARM5_REG a4
+#define __PT_PARM6_REG a5
+#define __PT_RET_REG ra
+#define __PT_FP_REG s0
+#define __PT_RC_REG a0
+#define __PT_SP_REG sp
+#define __PT_IP_REG epc
+#define __PT_ORIG_SYSCALL_REG a7
+
+#define REBOOT_SYMBOL "__riscv_sys_reboot"
+#define SYS_READ_SYMBOL "__riscv_sys_read"
+#define SYS_EXECVE_SYMBOL "__riscv_sys_execve"
+#define SYS_FSTAT_SYMBOL "__riscv_sys_newfstat"
 
 #else
-#ifdef CONFIG_KSU_TRACEPOINT_HOOK
 #error "Unsupported arch"
-#endif
 #endif
 
 /* allow some architecutres to override `struct pt_regs` */
@@ -77,6 +79,13 @@
 #endif
 
 #define PT_REGS_PARM1(x) (__PT_REGS_CAST(x)->__PT_PARM1_REG)
+/* RISC-V saves syscall argument zero before using a0 as the return slot.
+ * Kprobe C-call arguments (including PT_REAL_REGS) still use the live a0.
+ */
+#ifndef __PT_SYSCALL_PARM1_REG
+#define __PT_SYSCALL_PARM1_REG __PT_PARM1_REG
+#endif
+#define PT_REGS_SYSCALL_PARM1(x) (__PT_REGS_CAST(x)->__PT_SYSCALL_PARM1_REG)
 #define PT_REGS_PARM2(x) (__PT_REGS_CAST(x)->__PT_PARM2_REG)
 #define PT_REGS_PARM3(x) (__PT_REGS_CAST(x)->__PT_PARM3_REG)
 #define PT_REGS_SYSCALL_PARM4(x) (__PT_REGS_CAST(x)->__PT_SYSCALL_PARM4_REG)
@@ -90,10 +99,6 @@
 #define PT_REGS_IP(x) (__PT_REGS_CAST(x)->__PT_IP_REG)
 #define PT_REGS_ORIG_SYSCALL(x) (__PT_REGS_CAST(x)->__PT_ORIG_SYSCALL_REG)
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 16, 0)
 #define PT_REAL_REGS(regs) ((struct pt_regs *)PT_REGS_PARM1(regs))
-#else
-#define PT_REAL_REGS(regs) ((regs))
-#endif
 
 #endif

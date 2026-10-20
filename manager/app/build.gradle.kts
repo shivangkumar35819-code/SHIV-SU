@@ -173,7 +173,7 @@ baselineProfile {
 
 base {
     archivesName.set(
-        "ReSukiSU_${managerVersionName}_${managerVersionCode}"
+        "SHIVKSU-NEXT_${managerVersionName}_${managerVersionCode}"
     )
 }
 

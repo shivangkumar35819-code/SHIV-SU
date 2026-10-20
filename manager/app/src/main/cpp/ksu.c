@@ -296,59 +296,42 @@ void get_hook_type(char *buff) {
     }
 }
 
+// SukiSU v4.2.1 has a different manager ioctl. Never issue the old
+// ReSukiSU command numbers against it: those numbers have other meanings.
+#define ksu_manager_entry sukisu_manager_entry
+#include "backend-manager.h"
+#undef ksu_manager_entry
+
 int get_kernel_patch_implement() {
-    struct ksu_get_kernel_patch_implement cmd = {0};
-    if (ksuctl(KSU_IOCTL_GET_KERNEL_PATCH_IMPLEMENT, &cmd) != 0)
+    struct { unsigned char enabled; } cmd = {0};
+    if (ksuctl(_IOC(_IOC_READ, 'K', 102, 0), &cmd) != 0 || !cmd.enabled)
         return 0;
-    return cmd.type;
+    return KERNEL_PATCH_SUKISU;
 }
 
-bool get_dynamic_manager(struct ksu_dynamic_manager_cmd *cfg)
-{
-	if (!cfg) 
-		return false;
-
-	struct ksu_dynamic_manager_cmd cmd = {0};
-	cmd.operation = DYNAMIC_MANAGER_OP_GET;
-
-	if (ksuctl(KSU_IOCTL_DYNAMIC_MANAGER, &cmd) != 0)
-		return false;
-
-	*cfg = cmd;
-	return true;
+bool get_dynamic_manager(struct ksu_dynamic_manager_cmd *cfg) {
+    // A multi-entry authorization list cannot be represented by this legacy
+    // single-certificate UI. Hide that legacy setting instead of misreporting it.
+    (void)cfg;
+    return false;
 }
 
-/**
- * Get active manager list
- * @param out_cmd count, total_count, managers's out ptr
- * @return true on success, false on failure
- * @warning dynamic alloc memory INTERNALLY!!!
- */
 bool get_managers_list(struct ksu_get_managers_cmd **out_cmd) {
     if (!out_cmd) return false;
-
-    struct ksu_get_managers_cmd probe = {.count = 0};
-    if (ksuctl(KSU_IOCTL_GET_MANAGERS, &probe) != 0) {
+    *out_cmd = NULL;
+    struct ksu_manager_cmd backend = {.operation = KSU_MANAGER_GET};
+    if (ksuctl(_IOWR('K', 106, struct ksu_manager_cmd), &backend) != 0)
         return false;
+    if (backend.count > KSU_MANAGER_MAX_ENTRIES) return false;
+    size_t bytes = sizeof(struct ksu_get_managers_cmd)
+        + backend.count * sizeof(struct ksu_manager_entry);
+    struct ksu_get_managers_cmd *result = calloc(1, bytes);
+    if (!result) return false;
+    result->count = result->total_count = backend.count;
+    for (unsigned int i = 0; i < backend.count; ++i) {
+        result->managers[i].uid = backend.entries[i].uid;
+        result->managers[i].signature_index = 0;
     }
-
-    if (probe.total_count == 0) { // it shouldn't happen, but just in case...
-        *out_cmd = nullptr;
-        return false;
-    }
-
-    size_t payload_size = sizeof((*out_cmd)->managers[0]) * probe.total_count;
-    size_t total_size = sizeof(struct ksu_get_managers_cmd) + payload_size;
-
-    struct ksu_get_managers_cmd *cmd = malloc(total_size);
-    if (!cmd) return false;
-
-    cmd->count = probe.total_count;
-    if (ksuctl(KSU_IOCTL_GET_MANAGERS, cmd) != 0) {
-        free(cmd);
-        return false;
-    }
-
-    *out_cmd = cmd;
+    *out_cmd = result;
     return true;
 }
