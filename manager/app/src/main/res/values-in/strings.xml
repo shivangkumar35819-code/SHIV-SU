@@ -281,7 +281,7 @@
     <string name="license">Lisensi: %s</string>
     <string name="no_license_text">Tidak ada teks lisensi yang tersedia.</string>
     <string name="metamodule_uninstall_confirm">Yakin ingin menghapus modul %s? Tindakan ini akan memengaruhi semua modul, dan beberapa fitur yang disediakan oleh modulmeta (seperti mounting) tidak akan berfungsi lagi</string>
-    <string name="jailbreak_mode">Mode jailbreak</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">Jailbreak</string>
     <string name="jailbreak_timeout">Jailbreak mungkin gagal, silahkan periksa log</string>
     <string name="jailbreak_flash_warning">Anda sedang berada dalam **mode Jailbreak**. Melakukan flashing partisi pada perangkat dengan **bootloader terkunci** akan merusak AVB (Android Verified Boot) dan dapat menyebabkan perangkat **gagal melakukan boot**.\n\nPastikan bootloader Anda sudah terbuka sebelum melanjutkan!</string>

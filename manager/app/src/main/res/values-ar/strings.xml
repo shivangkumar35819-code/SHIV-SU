@@ -223,7 +223,7 @@
     <string name="visit_home_page">زر الصفحة الرئيسية</string>
     <string name="license">رخصة: %s</string>
     <string name="no_license_text">لايوجد نص للرخصة.</string>
-    <string name="jailbreak_mode">وضع جيلبريك</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">جيلبريك</string>
     <string name="jailbreak_timeout">الجيلبريك قد يكون فشل، رجاء تحقق من السجلات</string>
     <string name="jailbreak_flash_warning_countdown">تابع (%1$d)</string>

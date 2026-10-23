@@ -245,24 +245,6 @@ fun HomePage(
                         Spacer(modifier = Modifier.height(10.dp))
                     }
 
-                    if (!uiState.systemStatus.isOfficialSignature) {
-                        WarningCard(
-                            message = stringResource(
-                                R.string.unofficial_version_notice,
-                                stringResource(R.string.app_name)
-                            ),
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.TwoTone.Error,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onErrorContainer,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-
                     if (BuildConfig.IS_PR_BUILD || uiState.systemStatus.isPrBuild) {
                         WarningCard(
                             message = stringResource(
@@ -672,7 +654,7 @@ fun LearnMoreCard(
     showIcon: Boolean,
 ) {
     val uriHandler = LocalUriHandler.current
-    val url = stringResource(R.string.home_learn_kernelsu_url)
+    val url = stringResource(R.string.shivmods_community_url)
 
     SegmentedColumn(
         modifier = Modifier.fillMaxWidth(),
@@ -698,6 +680,7 @@ fun DonateCard(
     showIcon: Boolean,
 ) {
     val uriHandler = LocalUriHandler.current
+    val url = stringResource(R.string.shivmods_community_url)
     SegmentedColumn(
         modifier = Modifier.fillMaxWidth(),
         title = stringResource(R.string.home_support_title),
@@ -710,7 +693,7 @@ fun DonateCard(
                 title = stringResource(R.string.home_support_title),
                 description = stringResource(R.string.home_support_content),
                 onClick = {
-                    uriHandler.openUri("https://patreon.com/weishu")
+                    uriHandler.openUri(url)
                 },
             )
         }

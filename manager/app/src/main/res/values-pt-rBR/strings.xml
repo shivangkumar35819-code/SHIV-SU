@@ -150,7 +150,7 @@
     <string name="license">Licença: %s</string>
     <string name="no_license_text">Não há texto de licença disponível</string>
     <string name="metamodule_uninstall_confirm">Tem certeza de que deseja desinstalar o módulo %s? Esta ação afetará todos os módulos e certos recursos fornecidos pelo metamódulo (como a montagem) deixarão de funcionar.</string>
-    <string name="jailbreak_mode">Modo Jailbreak</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">Jailbreak</string>
     <string name="jailbreak_timeout">A operação de jailbreak pode ter falhado. Por favor, verifique os registros</string>
     <string name="jailbreak_flash_warning">Você está no **modo Jailbreak**. A instalação de uma partição em um dispositivo com o **bootloader bloqueado** irá quebrar o AVB (Android Verified Boot) e poderá fazer com que o dispositivo **não inicialize**.\n\nCertifique-se de que seu bootloader esteja desbloqueado antes de prosseguir!</string>

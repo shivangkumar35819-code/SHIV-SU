@@ -75,7 +75,7 @@
     <string name="show_system_apps">Показать системные приложения</string>
     <string name="send_log">Отправить логи</string>
     <string name="safe_mode">Безопасный режим</string>
-    <string name="jailbreak_mode">Режим Jailbreak</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">Jailbreak</string>
     <string name="jailbreak_timeout">Возможно, сбой Jailbreak. Пожалуйста, проверьте логи</string>
     <string name="jailbreak_flash_warning">Вы находитесь в **режиме Jailbreak**. Прошивка раздела на устройстве с **заблокированным загрузчиком** нарушит защиту AVB (Android Verified Boot) и может привести к тому, что устройство **не загрузится**.\n\nПеред тем как продолжить, убедитесь, что ваш загрузчик разблокирован!</string>

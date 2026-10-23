@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="login_brand">shivxroot</string>
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Your access. Your device.</string>
+    <string name="login_license">License key</string>
+    <string name="login_code">6-digit verification code</string>
+    <string name="login_request">Request code</string>
+    <string name="login_resend">Request new code</string>
+    <string name="login_verify">Verify and continue</string>
+    <string name="login_countdown">Code expires in %1$d seconds</string>
+    <string name="login_expired">Code expired. Request a new code.</string>
+    <string name="login_privacy">Continuing shares your IP address, approximate location (when available), and device model with the access administrator for login verification.</string>
+    <string name="login_binding">One license · One device</string>
+    <string name="login_unconfigured">Login service is not configured yet.</string>
+    <string name="login_network_error">Cannot reach the login service. Please try again.</string>
+    <string name="login_invalid_license">License is invalid or has been revoked.</string>
+    <string name="login_device_bound">This license is already linked to another device.</string>
+    <string name="login_invalid_code">Incorrect code. Please try again.</string>
+    <string name="login_rate_limit">Please wait 30 seconds before requesting another code.</string>
+    <string name="login_delivery_error">Code delivery failed. Please try again shortly.</string>
+    <string name="login_session_expired">Session expired. Please verify again.</string>
+    <string name="login_retry">Retry connection</string>
+</resources>

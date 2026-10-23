@@ -76,7 +76,7 @@
     <string name="show_system_apps">Показати системні додатки</string>
     <string name="send_log">Надіслати логи</string>
     <string name="safe_mode">Безпечний режим</string>
-    <string name="jailbreak_mode">Режим Jailbreak</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">Jailbreak</string>
     <string name="jailbreak_timeout">Jailbreak, можливо, не вдався. Будь ласка, перевірте журнали</string>
     <string name="jailbreak_flash_warning">Ви перебуваєте в **режимі Jailbreak**. Прошивка розділу на пристрої із **заблокованим завантажувачем** порушить AVB (Android Verified Boot) і може призвести до **збою завантаження**.\n\nПереконайтеся, що завантажувач розблоковано, перш ніж продовжити!</string>

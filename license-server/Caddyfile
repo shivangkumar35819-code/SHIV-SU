@@ -1,0 +1,8 @@
+{$LOGIN_DOMAIN} {
+    request_body {
+        max_size 12KB
+    }
+    reverse_proxy api:8080 {
+        header_up X-Forwarded-For {remote_host}
+    }
+}

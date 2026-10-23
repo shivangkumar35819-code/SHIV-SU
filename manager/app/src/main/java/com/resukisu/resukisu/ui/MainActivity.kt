@@ -26,6 +26,7 @@ import com.resukisu.resukisu.domain.usecase.ObserveStartupStateUseCase
 import com.resukisu.resukisu.ui.activity.util.ThemeChangeContentObserver
 import com.resukisu.resukisu.ui.activity.util.ThemeUtils
 import com.resukisu.resukisu.ui.component.ZipFileInfo
+import com.resukisu.resukisu.ui.screen.login.LicenseGate
 import com.resukisu.resukisu.ui.theme.KernelSUTheme
 import com.resukisu.resukisu.ui.viewmodel.HomeUiAction
 import com.resukisu.resukisu.ui.viewmodel.HomeViewModel
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         try {
-            val splashScreen = installSplashScreen()
+            installSplashScreen()
 
             // Enable edge to edge
             enableEdgeToEdge()
@@ -77,13 +78,7 @@ class MainActivity : ComponentActivity() {
 
             super.onCreate(savedInstanceState)
 
-            splashScreen.setKeepOnScreenCondition {
-                shouldKeepStartupSplash(
-                    startupState = startupState.value,
-                    homeInitialDataLoaded = homeViewModel.homeStateRepository.state.value.isInitialDataLoaded,
-                )
-            }
-
+            // Login must be visible even if kernel/startup data cannot be loaded.
             lifecycleScope.launch { ensureManagerInstalled() }
             lifecycleScope.launch {
                 settingsViewModel.events.collect { event ->
@@ -148,15 +143,17 @@ class MainActivity : ComponentActivity() {
 
             setContent {
                 KernelSUTheme {
-                    when (val state = startupState.collectAsStateWithLifecycle().value) {
-                        is StartupState.Failed -> StartupFailureContent(state.message)
-                        else -> NavContainer(
-                            zipUri = zipUri,
-                            intentState = intentState,
-                            settingsViewModel = settingsViewModel,
-                            showConfirmationDialog = showConfirmationDialog,
-                            pendingZipFiles = pendingZipFiles,
-                        )
+                    LicenseGate {
+                        when (val state = startupState.collectAsStateWithLifecycle().value) {
+                            is StartupState.Failed -> StartupFailureContent(state.message)
+                            else -> NavContainer(
+                                zipUri = zipUri,
+                                intentState = intentState,
+                                settingsViewModel = settingsViewModel,
+                                showConfirmationDialog = showConfirmationDialog,
+                                pendingZipFiles = pendingZipFiles,
+                            )
+                        }
                     }
                 }
             }

@@ -8,3 +8,9 @@ build.sh
 /*-build.log
 *.jks
 *.keystore
+
+# License service secrets and runtime state
+/license-server/.env
+/license-server/data/
+/license-server/.venv/
+**/__pycache__/

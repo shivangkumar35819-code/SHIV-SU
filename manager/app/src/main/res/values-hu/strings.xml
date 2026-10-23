@@ -284,7 +284,7 @@
     <string name="visit_home_page">Kezdőlap megtekintése</string>
     <string name="license">Licenc: %s</string>
     <string name="no_license_text">Licencszövegezés nem elérhető.</string>
-    <string name="jailbreak_mode">Jailbreak mód</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="jailbreak_timeout">Jailbreak nem ment végbe, ellenőrizd a naplóbejegyzéseket</string>
     <string name="manage_app_profile">App Profile Sablonkezelő</string>
     <string name="predictive_back_animation_ksu_classic">KernelSU klasszikus</string>

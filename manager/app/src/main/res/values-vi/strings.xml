@@ -288,7 +288,7 @@
     <string name="sulog_entry_unknown_event">Sự kiện không xác định</string>
     <string name="sulog_search_placeholder">Tìm kiếm nhật ký</string>
     <string name="reboot_soft">Khởi động lại phần mềm</string>
-    <string name="jailbreak_mode">Chế độ Jailbreak</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">Bẻ Khóa</string>
     <string name="jailbreak_timeout">Quá trình Jailbreak có thể thất bại, vui lòng kiểm tra nhật ký</string>
     <string name="jailbreak_flash_warning">Bạn đang ở **chế độ Jailbreak**. Việc ghi lại phân vùng trên thiết bị có **bootloader bị khóa** sẽ làm hỏng AVB (Android Verified Boot) và có thể khiến thiết bị **không khởi động được**.\n\nHãy đảm bảo rằng bootloader của bạn đã được mở khóa trước khi tiếp tục!</string>

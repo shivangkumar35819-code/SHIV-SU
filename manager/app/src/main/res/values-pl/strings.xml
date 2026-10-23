@@ -148,7 +148,7 @@
     <string name="module_sort_star_first">Sortuj wg gwiazdek</string>
     <string name="visit_home_page">Odwiedź stronę główną</string>
     <string name="no_license_text">Brak tekstu licencji.</string>
-    <string name="jailbreak_mode">Tryb jailbreak</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">Jailbreak</string>
     <string name="jailbreak_timeout">Jailbreak mógł się nie powieść, sprawdź dziennik</string>
     <string name="jailbreak_flash_warning">Jesteś w **Trybie jailbreak**. Wgrywanie partycji na urządzeniu z **zablokowanym bootloaderem** uszkodzi AVB (Android Verified Boot) i może spowodować, że urządzenie **nie będzie się uruchamiać**.\n\nUpewnij się, że twój bootloader jest odblokowany zankm przejdziesz dalej!</string>

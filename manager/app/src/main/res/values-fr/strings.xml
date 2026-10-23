@@ -221,7 +221,7 @@
     <string name="no_license_text">Aucun texte de licence disponible.</string>
     <string name="metamodule_uninstall_confirm">Désinstaller le module %s ? Cette action affectera tous les modules et certaines fonctionnalités fournies par le métamodule (comme le montage de volumes) ne seront plus disponibles.</string>
     <string name="module_version">Version</string>
-    <string name="jailbreak_mode">Mode jailbreak</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">Jailbreak</string>
     <string name="jailbreak_timeout">Le jailbreak a peut-être échoué, consulter les journaux</string>
     <string name="jailbreak_flash_warning">Appareil en **mode jailbreak**. Flasher une partition sur un appareil avec un **bootloader verrouillé** désactivera AVB (Android Verified Boot) et pourrait **empêcher le démarrage** de l\'appareil.\n\nVérifier que le bootloader de cet appareil est déverrouillé avant de continuer !</string>

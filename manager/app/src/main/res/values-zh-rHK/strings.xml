@@ -76,7 +76,7 @@
     <string name="show_system_apps">顯示系統應用程式</string>
     <string name="send_log">發送日誌</string>
     <string name="safe_mode">安全模式</string>
-    <string name="jailbreak_mode">越獄模式</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">越獄</string>
     <string name="jailbreak_timeout">越獄可能失敗，請檢查日誌</string>
     <string name="jailbreak_flash_warning">當前處於**越獄模式**。喺**未解鎖 Bootloader** 嘅裝置上刷寫分區會破壞 AVB（Android 驗證啟動），可能導致裝置**無法開機**。\n\n請確保 Bootloader 已解鎖後再繼續操作！</string>

@@ -76,7 +76,7 @@
     <string name="show_system_apps">Sistem uygulamalarını göster</string>
     <string name="send_log">Günlükleri gönder</string>
     <string name="safe_mode">Güvenli mod</string>
-    <string name="jailbreak_mode">Jailbreak modu</string>
+    <string name="jailbreak_mode">shivxroot</string>
     <string name="home_jailbreak">Jailbreak</string>
     <string name="jailbreak_timeout">Jailbreak başarısız olmuş olabilir, günlükleri kontrol edin</string>
     <string name="jailbreak_flash_warning">**Jailbreak modu**ndasınız. **Kilitli bootloader**a sahip bir cihazda bir bölümü flaşlarsanız AVB (Android Boot Doğrulaması) bozulup cihazınızın **boot olmamasına** neden olabilir.\n\nBaşlamadan önce bootloader kilidinizi açtığınıza emin olun!</string>

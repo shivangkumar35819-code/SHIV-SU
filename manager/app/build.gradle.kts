@@ -130,6 +130,11 @@ android {
 
         val isPrBuild = rootProject.extra["isPrBuild"] as Boolean
         buildConfigField("boolean", "IS_PR_BUILD", isPrBuild.toString())
+        val licenseServerUrl = providers.gradleProperty("LICENSE_SERVER_URL").orElse("").get().trimEnd('/')
+        require(licenseServerUrl.isEmpty() || Regex("https://[A-Za-z0-9.-]+(:[0-9]+)?").matches(licenseServerUrl)) {
+            "LICENSE_SERVER_URL must be an HTTPS origin without a path"
+        }
+        buildConfigField("String", "LICENSE_SERVER_URL", "\"$licenseServerUrl\"")
         resValue("string", "app_name", managerName)
 
         externalNativeBuild {
