@@ -103,6 +103,8 @@ def send_code(code, ip, device):
                f"🌐 IP: {ip}\n📍 Location: {location(ip)}\n🕒 Date & time: {stamp}\n"
                f"📱 Device: {device}\n━━━━━━━━━━━━━━━━━━━━\n"
                f"🔐 Code: {code}\n⏳ Expires in 30 seconds")
+    if os.environ.get("GEOIP_CREDIT"):
+        message += "\n" + os.environ["GEOIP_CREDIT"]
     payload = json.dumps({"chat_id": CHAT_ID, "text": message}).encode()
     request = urllib.request.Request(
         f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",

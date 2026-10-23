@@ -1,6 +1,12 @@
 # shivxroot license login service
 
-Prepared for deployment; no server or domain has been provisioned. No APK has been built for this change.
+Production API: `https://shivmodsstore.shop`. The VPS deployment uses an isolated `shivxroot-login` system user and systemd service, a virtual environment under `/opt/shivxroot-login`, and a database under `/var/lib/shivxroot-login`. Its Nginx virtual host is separate from existing domains. Secrets are in root-only `/etc/shivxroot-login.env` on the server and are not included in this repository.
+
+On the VPS, `/opt/shivxroot-login/admin create-license` creates a license. Use the same command with `revoke --license KEY` or `reset-device --license KEY` for administration. The initial unbound license is stored in root-only `/root/shivxroot-first-license.txt`. No license keys are published in release assets.
+
+The production server uses the October 2026 DB-IP City Lite database for approximate IP locations. IP Geolocation by DB-IP: https://db-ip.com (CC BY 4.0). Telegram messages include this attribution. The database is downloaded separately; it is not included in the APK or source repository. Cloudflare real-IP trust is restricted to official Cloudflare proxy networks, inside this virtual host only.
+
+The Docker instructions below are an alternative deployment method, not the running VPS layout.
 
 ## Deploy on a Linux VPS
 
@@ -16,7 +22,7 @@ The bot token and server secret belong only in `.env` or your hosting secret man
 ## Login behavior
 
 - User enters a license key and requests a six-digit code. The server sends the requested message format, in plain text, only to chat `7614397503`; no code or chat ID is returned to the app.
-- IP comes from the HTTPS proxy. Device model comes from Android. Time is Asia/Kolkata. Approximate IP location is optional: provide a licensed GeoLite2 City database, mount it read-only into the API container and set `GEOIP_DATABASE` to its container path. Without it, the message honestly says location is unavailable; no GPS permission or external geolocation lookup is used.
+- IP comes from the HTTPS proxy. Device model comes from Android. Time is Asia/Kolkata. Approximate IP location is optional for other installations: provide a licensed GeoLite2 City or DB-IP City Lite database, mount it read-only into the API container and set `GEOIP_DATABASE` to its container path. Without it, the message honestly says location is unavailable; no GPS permission or external geolocation lookup is used.
 - Server expiry is exactly 30 seconds after Telegram accepts the message. Admin must relay the code within that interval. The UI countdown starts earlier, before the request round trip, so it cannot extend server expiry.
 - New requests replace the old challenge, are limited to one per 30 seconds per IP and license, and allow five incorrect code attempts. Codes are hashed with a server-side secret and used once.
 - Successful verification atomically binds the license to an Android Keystore RSA key. Session validation requires proof of that key, including a fresh nonce, so copying the session token alone is insufficient. Another device is refused. Reinstall/reset can lose this key and requires an administrator reset.
