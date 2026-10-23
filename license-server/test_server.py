@@ -56,6 +56,23 @@ class LoginTests(unittest.TestCase):
             operation()
         self.assertEqual(reason, error.exception.code)
 
+    def test_custom_key_is_exact_and_only_hash_is_stored(self):
+        key = server.create_license("Rahul123")
+        self.assertEqual("Rahul123", key)
+        with server.connect() as db:
+            row = db.execute("SELECT id,device FROM licenses WHERE id=?", (server.digest(key),)).fetchone()
+            self.assertIsNotNone(row)
+            self.assertNotEqual(key, row["id"])
+            self.assertIsNone(row["device"])
+        with self.assertRaisesRegex(ValueError, "already exists"):
+            server.create_license("Rahul123")
+
+    def test_invalid_keys_rejected_and_random_keys_still_supported(self):
+        for key in ("", " name", "name ", "a\nb", "x" * 201):
+            with self.assertRaises(ValueError):
+                server.create_license(key)
+        self.assertEqual(32, len(server.create_license()))
+
     def test_expiry_exactly_at_30_seconds(self):
         challenge = self.request()["challenge"]
         self.time.return_value = 1030

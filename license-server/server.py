@@ -200,6 +200,18 @@ def validate_session(data):
     return {"valid": True}
 
 
+def create_license(custom_key=None):
+    key = secrets.token_urlsafe(24) if custom_key is None else custom_key
+    if not 1 <= len(key) <= 200 or key != key.strip() or any(ord(c) < 32 for c in key):
+        raise ValueError("Key must contain 1-200 characters without surrounding whitespace or control characters")
+    try:
+        with connect() as db:
+            db.execute("INSERT INTO licenses(id) VALUES (?)", (digest(key),))
+    except sqlite3.IntegrityError:
+        raise ValueError("This key already exists; choose a different key") from None
+    return key
+
+
 class Handler(BaseHTTPRequestHandler):
     def setup(self):
         super().setup()
@@ -258,13 +270,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["serve", "create-license", "revoke", "reset-device"])
     parser.add_argument("--license")
+    parser.add_argument("--key", "--name", dest="custom_key", help="Use this exact text as the new license key")
     args = parser.parse_args()
     init_db()
     if args.command == "create-license":
-        key = secrets.token_urlsafe(24)
-        with connect() as db:
-            db.execute("INSERT INTO licenses(id) VALUES (?)", (digest(key),))
-        print(key)
+        try:
+            print(create_license(args.custom_key))
+        except ValueError as error:
+            parser.error(str(error))
     elif args.command in ("revoke", "reset-device"):
         if not args.license:
             parser.error("--license is required")

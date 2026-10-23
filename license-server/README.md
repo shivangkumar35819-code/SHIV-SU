@@ -53,3 +53,5 @@ python -m unittest -v test_server
 ```
 
 Tests mock Telegram delivery; they never contact the bot or send user information. API integration uses Telegram's official `sendMessage` endpoint: https://core.telegram.org/bots/api#sendmessage.
+
+Custom keys: `/opt/shivxroot-login/admin create-license --key 'Rahul123'` creates exactly `Rahul123`, with no suffix. `--name` is an alias for `--key`. Keys are case-sensitive; duplicates are rejected without modifying the existing license or its binding. Omitting the option still generates a random key. Use the complete key to log in, revoke, or reset a device.
