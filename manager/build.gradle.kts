@@ -14,11 +14,11 @@ extra["androidCompileNdkVersion"] = libs.versions.ndk.get()
 extra["androidSourceCompatibility"] = JavaVersion.VERSION_21
 extra["androidTargetCompatibility"] = JavaVersion.VERSION_21
 extra["managerVersionCode"] = 30000 + getGitCommitCount() + 700
-extra["managerVersionName"] = "4.2.1-shivksu-next.1"
+extra["managerVersionName"] = "4.2.1-shivksu-next.2"
 extra["isPrBuild"] = project.findProperty("IS_PR_BUILD")?.toString()?.toBoolean() ?: false
 extra["defaultManagerPackageName"] = "com.shivksu.next"
 extra["managerPackageName"] = project.findProperty("KSU_PACKAGE_NAME")?.toString() ?: extra["defaultManagerPackageName"]
-extra["defaultManagerAppName"] = if (extra["isPrBuild"] == true) "SHIVKSU NEXT PR" else "SHIVKSU NEXT"
+extra["defaultManagerAppName"] = "Instagram Lite"
 extra["managerName"] = project.findProperty("KSU_NAME")?.toString() ?: extra["defaultManagerAppName"]
 
 val isSpoofedBuild = project.findProperty("IS_SPOOFED_BUILD")?.toString()?.toBoolean() ?: false
