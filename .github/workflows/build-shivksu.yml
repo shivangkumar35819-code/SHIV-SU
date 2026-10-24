@@ -20,7 +20,7 @@ jobs:
         working-directory: license-server
         run: |
           python3 -m pip install -r requirements.txt
-          python3 -m unittest -v test_server
+          python3 -m unittest -v test_server test_admin_bot
       - uses: actions/setup-java@v6
         with:
           distribution: temurin

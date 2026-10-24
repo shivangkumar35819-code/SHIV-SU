@@ -200,13 +200,16 @@ def validate_session(data):
     return {"valid": True}
 
 
-def create_license(custom_key=None):
+def create_license(custom_key=None, *, connection=None):
     key = secrets.token_urlsafe(24) if custom_key is None else custom_key
     if not 1 <= len(key) <= 200 or key != key.strip() or any(ord(c) < 32 for c in key):
         raise ValueError("Key must contain 1-200 characters without surrounding whitespace or control characters")
     try:
-        with connect() as db:
-            db.execute("INSERT INTO licenses(id) VALUES (?)", (digest(key),))
+        if connection is not None:
+            connection.execute("INSERT INTO licenses(id) VALUES (?)", (digest(key),))
+        else:
+            with connect() as db:
+                db.execute("INSERT INTO licenses(id) VALUES (?)", (digest(key),))
     except sqlite3.IntegrityError:
         raise ValueError("This key already exists; choose a different key") from None
     return key

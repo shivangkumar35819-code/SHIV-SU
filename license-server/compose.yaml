@@ -15,6 +15,17 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
+  admin-bot:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    command: ["python", "admin_bot.py"]
+    volumes:
+      - licenses:/app/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
   caddy:
     image: caddy:2
     restart: unless-stopped

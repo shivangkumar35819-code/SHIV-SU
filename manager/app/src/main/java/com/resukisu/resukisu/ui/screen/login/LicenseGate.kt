@@ -30,7 +30,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,9 +48,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
 import com.resukisu.resukisu.R
 import com.resukisu.resukisu.data.auth.LicenseFailure
 import com.resukisu.resukisu.data.auth.LicenseRepository
@@ -63,43 +59,13 @@ import kotlinx.coroutines.launch
 fun LicenseGate(content: @Composable () -> Unit) {
     val context = LocalContext.current
     val repository = remember { LicenseRepository(context) }
-    var authorized by remember { mutableStateOf(false) }
-    var checking by remember { mutableStateOf(repository.hasSession) }
-    var error by remember { mutableIntStateOf(0) }
-    var retry by remember { mutableIntStateOf(0) }
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-
-    LaunchedEffect(repository, retry, lifecycle) {
-        lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-            // Hide protected content while foreground authorization is checked.
-            authorized = false
-            while (true) {
-                if (repository.hasSession) {
-                    checking = !authorized
-                    try {
-                        authorized = repository.validate()
-                        error = 0
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        authorized = false
-                        error = loginError(e)
-                    } finally {
-                        checking = false
-                    }
-                } else {
-                    checking = false
-                }
-                delay(30_000)
-            }
-        }
-    }
+    // Verification persists in app storage. Returning from a picker or reopening
+    // the app must not restart login or discard the current navigation state.
+    var authorized by remember { mutableStateOf(repository.hasSession) }
     if (authorized) {
         content()
-    } else if (checking) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
     } else {
-        LoginScreen(repository, error, onVerified = { retry++ }, onRetry = { retry++ })
+        LoginScreen(repository, onVerified = { authorized = true })
     }
 }
 
@@ -116,7 +82,7 @@ private fun loginError(error: Exception): Int = when ((error as? LicenseFailure)
 }
 
 @Composable
-private fun LoginScreen(repository: LicenseRepository, sessionError: Int, onVerified: () -> Unit, onRetry: () -> Unit) {
+private fun LoginScreen(repository: LicenseRepository, onVerified: () -> Unit) {
     var license by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
     var challenge by remember { mutableStateOf<String?>(null) }
@@ -171,7 +137,7 @@ private fun LoginScreen(repository: LicenseRepository, sessionError: Int, onVeri
                                 else stringResource(R.string.login_expired), style = MaterialTheme.typography.bodySmall)
                         }
                     }
-                    val shownError = if (!repository.configured) R.string.login_unconfigured else if (error != 0) error else sessionError
+                    val shownError = if (!repository.configured) R.string.login_unconfigured else error
                     if (shownError != 0) Text(stringResource(shownError), color = MaterialTheme.colorScheme.error)
                     Text(stringResource(R.string.login_privacy), style = MaterialTheme.typography.bodySmall)
                     Button(
@@ -207,11 +173,6 @@ private fun LoginScreen(repository: LicenseRepository, sessionError: Int, onVeri
                         }
                     ) { Text(stringResource(R.string.login_verify)) }
                     if (busy) CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
-                    if (repository.hasSession && sessionError != 0) {
-                        TextButton(onClick = onRetry, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            Text(stringResource(R.string.login_retry))
-                        }
-                    }
                 }
             }
             Text(stringResource(R.string.login_binding), style = MaterialTheme.typography.labelLarge)
