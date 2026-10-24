@@ -1,4 +1,5 @@
-# SHIVKSU NEXT
+# SHIV-SUKISU
+
 
 Android manager/UI based on Baka-SU/BakaSU v4.2.0-rc3 (239e1e8).
 Kernel, shared UAPI, ksud and ksuinit use SukiSU-Ultra v4.2.1 (fd2a851).
